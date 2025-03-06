@@ -1,7 +1,7 @@
 resource "aws_vpc" "vpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
-    Name = "Terraform-vpc"
+    Name = "Terraform-vpc-${var.environment}"
   }
 }
 
@@ -10,7 +10,7 @@ resource "aws_subnet" "vpc_subnet" {
   cidr_block = "10.0.1.0/24"
 
   tags = {
-    Name = "Terraform-Subnet"
+    Name = "Terraform-Subnet-${var.environment}"
   }
 }
 
@@ -18,7 +18,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "terraform-IGW"
+    Name = "terraform-IGW-${var.environment}"
   }
 }
 resource "aws_route_table" "route_table" {
@@ -46,7 +46,7 @@ resource "aws_security_group" "Allow_ssh" {
   vpc_id      = aws_vpc.vpc.id
 
   tags = {
-    Name = "allow_ssh"
+    Name = "allow_ssh-${var.environment}"
   }
 }
 
@@ -56,7 +56,7 @@ resource "aws_security_group" "allow_port80" {
   vpc_id      = aws_vpc.vpc.id
 
   tags = {
-    Name = "allow_port80"
+    Name = "allow_port80-${var.environment}"
   }
 }
 
@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_egress_rule" "egress_0" {
   to_port     = 0
 
   tags = {
-    Name = "egress 0"
+    Name = "egress 0-${var.environment}"
   }
 }
 
@@ -82,7 +82,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_22" {
   ip_protocol = "tcp"
 
   tags = {
-    Name = "Ingress 22"
+    Name = "Ingress 22-${var.environment}"
   }
 }
 
@@ -95,7 +95,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_80" {
   ip_protocol = "tcp"
 
   tags = {
-    Name = "Ingress 80"
+    Name = "Ingress 80-${var.environment}"
   }
 }
 resource "aws_vpc_security_group_ingress_rule" "ingress_8080" {
@@ -107,7 +107,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_8080" {
   ip_protocol = "tcp"
 
   tags = {
-    Name = "Ingress 80"
+    Name = "Ingress 8080-${var.environment}"
   }
 }
 
