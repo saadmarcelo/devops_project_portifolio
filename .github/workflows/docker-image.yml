@@ -26,8 +26,15 @@ jobs:
           BASE_VERSION="V1.0."
           IMAGE="saadmarcelo/api_python"
 
-          # Consulta tags remotas no Docker Hub
-          TAGS=$(curl -s "https://hub.docker.com/v2/repositories/${IMAGE}/tags/?page_size=100" | jq -r '.results[].name')
+          # Autenticar e pegar token de acesso
+          TOKEN=$(curl -s -H "Content-Type: application/json" \
+            -X POST -d '{"username": "'"${{ secrets.DOCKERHUB_USERNAME }}"'", "password": "'"${{ secrets.DOCKERHUB_TOKEN }}"' }' \
+            https://hub.docker.com/v2/users/login/ | jq -r .token)
+
+          # Usar token para consultar as tags
+          TAGS=$(curl -s -H "Authorization: JWT $TOKEN" \
+            "https://hub.docker.com/v2/repositories/saadmarcelo/api_python/tags/?page_size=100" | jq -r '.results[].name')
+                   TAGS=$(curl -s "https://hub.docker.com/v2/repositories/${IMAGE}/tags/?page_size=100" | jq -r '.results[].name')
 
           # Filtra tags que seguem o padrão v1.0.X
           LAST_VERSION=$(echo "$TAGS" | grep -oP '^v1\.0\.\d+$' | sed 's/v1\.0\.//' | sort -n | tail -1)
