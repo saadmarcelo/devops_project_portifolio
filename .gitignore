@@ -2,3 +2,4 @@
 *.terraform*
 aws-key*
 plano.out
+*.DS_Store 
