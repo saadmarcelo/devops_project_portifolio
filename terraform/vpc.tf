@@ -111,7 +111,7 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_8080" {
   }
 }
 
-resource "aws_eip" "iep" {
+resource "aws_eip" "eip" {
   depends_on = [aws_internet_gateway.gw]
   domain     = "vpc"
   instance   = aws_instance.vm.id
