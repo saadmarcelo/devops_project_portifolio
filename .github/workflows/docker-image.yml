@@ -28,13 +28,20 @@ jobs:
 
           # Autenticar e pegar token de acesso
           TOKEN=$(curl -s -H "Content-Type: application/json" \
-            -X POST -d '{"username": "'"${{ secrets.DOCKERHUB_USERNAME }}"'", "password": "'"${{ secrets.DOCKERHUB_TOKEN }}"' }' \
+            -X POST -d '{"username": "${{ secrets.DOCKERHUB_USERNAME }}", "password": "${{ secrets.DOCKERHUB_TOKEN }}"}' \
             https://hub.docker.com/v2/users/login/ | jq -r .token)
 
+          # Verifica se token foi obtido
+          if [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
+            echo "Erro ao autenticar no Docker Hub"
+            exit 1
+          fi
+
           # Usar token para consultar as tags
-          TAGS=$(curl -s -H "Authorization: JWT $TOKEN" \
-            "https://hub.docker.com/v2/repositories/saadmarcelo/api_python/tags/?page_size=100" | jq -r '.results[].name')
-                   TAGS=$(curl -s "https://hub.docker.com/v2/repositories/${IMAGE}/tags/?page_size=100" | jq -r '.results[].name')
+          RESPONSE=$(curl -s -H "Authorization: JWT $TOKEN" \
+            "https://hub.docker.com/v2/repositories/${IMAGE}/tags/?page_size=100")
+
+          TAGS=$(echo "$RESPONSE" | jq -r '.results // [] | .[].name')
 
           # Filtra tags que seguem o padrão v1.0.X
           LAST_VERSION=$(echo "$TAGS" | grep -oP '^v1\.0\.\d+$' | sed 's/v1\.0\.//' | sort -n | tail -1)
@@ -49,6 +56,7 @@ jobs:
 
           echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
           echo "tag=${NEW_TAG}" >> $GITHUB_OUTPUT
+
       - name: Build the Docker image
         run: docker build . --file Dockerfile -t saadmarcelo/api_python:latest -t saadmarcelo/api_python:${{ env.NEW_TAG }}
 
