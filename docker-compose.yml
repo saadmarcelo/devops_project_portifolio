@@ -2,7 +2,7 @@ version: "2.4"
 services:
   counter-service:
     container_name: counter-service-exercise
-    image:
+    image: saadmarcelo/api_python
     volumes:
       - ./data:/data
     ports:
